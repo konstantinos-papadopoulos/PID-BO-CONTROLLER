@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/konstantinos-papadopoulos/PID-BO-CONTROLLER.svg?branch=master)](https://travis-ci.org/konstantinos-papadopoulos/PID-BO-CONTROLLER)
-[![Build Status](https://travis-ci.org/intracom-telecom-sdn/nstat.svg?branch=master)](https://travis-ci.org/intracom-telecom-sdn/nstat)
+[![Build Status](.. image:: https://travis-ci.org/konstantinos-papadopoulos/PID-BO-CONTROLLER.svg?branch=master
+    :target: https://travis-ci.org/konstantinos-papadopoulos/PID-BO-CONTROLLER)](https://travis-ci.org/konstantinos-papadopoulos/PID-BO-CONTROLLER)
 =========================
  PID controller automatic tuning via the Magnitude Optimum Criterion
 =========================
