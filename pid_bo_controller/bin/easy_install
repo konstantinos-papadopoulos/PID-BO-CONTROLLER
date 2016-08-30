@@ -1,0 +1,11 @@
+#!/media/kostis/86566ECA566EBB17/D/01.PhD/PhDThesis/04.sw/gitrepos/auth/pid_bo_controller/pid_bo_controller.src/pid_bo_controller/bin/python2
+
+# -*- coding: utf-8 -*-
+import re
+import sys
+
+from setuptools.command.easy_install import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
