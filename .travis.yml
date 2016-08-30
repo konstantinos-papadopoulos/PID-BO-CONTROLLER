@@ -15,9 +15,9 @@ before_script:
 script:
   - echo "Running Unittests"
 # - cd util/unittests
-  - coverage erase
-  - coverage run --omit='/usr/local/lib/python3.4/*' --include='../*.py' --parallel-mode ../../my_module/main.py --help
-  - coverage combine
+#  - coverage erase
+#  - coverage run --omit='/usr/local/lib/python3.4/*' --include='../*.py' --parallel-mode ../../my_module/main.py --help
+#  - coverage combine
 after_success:
   coveralls
 notifications:
