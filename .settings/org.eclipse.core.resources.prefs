@@ -2,4 +2,5 @@ eclipse.preferences.version=1
 encoding//my_module/main.py=utf-8
 encoding//my_module/metadata.py=utf-8
 encoding//tests/test_main.py=utf-8
+encoding/pavement.py=utf-8
 encoding/setup.py=utf-8
