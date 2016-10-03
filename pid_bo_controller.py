@@ -6,6 +6,7 @@
 
 
 
+
 """
 Main configuration script for choosing the control loop design
 -The control loop can be of type-I, type-II, type-III, type-V
@@ -15,6 +16,7 @@ Main configuration script for choosing the control loop design
 """
 
 import argparse
+import plant
 
 
 def main():
@@ -33,12 +35,6 @@ def main():
                              "type_III (for zero steady state position/velocity/acceleration error)\n"
                              "type_IV  (for elimination higher order errors )"
                              )
-    parser.add_argument('--bypass-execution',
-                        dest='bypass_test',
-                        action='store_true',
-                        default=False,
-                        help="bypass test execution and proceed to report\n"
-                             "generation, based on a previous output.")
     parser.add_argument('--plant',
                         required=True,
                         type=str,
@@ -47,8 +43,29 @@ def main():
                         help="random\n"
                              "determined"
                              )
-    parser.add_argument('--design_type',
+    parser.add_argument('--poles',
                         required=True,
+                        type=str,
+                        dest='poles',
+                        action='store',
+                        help="number of poles"
+                             )
+    parser.add_argument('--zeros',
+                        required=True,
+                        type=str,
+                        dest='zeros',
+                        action='store',
+                        help="number of zeros"
+                             )
+    parser.add_argument('--time-delay',
+                        required=True,
+                        type=str,
+                        dest='time_delay',
+                        action='store',
+                        help="time delay of the controlled process"
+                             )
+    parser.add_argument('--design_type',
+                        required=False,
                         type=str,
                         dest='plant',
                         action='store',
@@ -60,7 +77,7 @@ def main():
                         action='store',
                         help='log file name')
     parser.add_argument('--output-dir',
-                        required=True,
+                        required=False,
                         type=str,
                         dest='output_dir',
                         action='store',
@@ -77,6 +94,11 @@ def main():
                              "ERROR")
 
     args = parser.parse_args()
+
+    var = input("Please enter something: ")
+    print(var)
+    print(args.poles)
+    plant.create_plant(poles, zeros, time_delay, user_defined_plant)
 
 
 if __name__ == '__main__':

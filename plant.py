@@ -1,3 +1,4 @@
+
 # Copyright (c) 2016 Konstantinos G. Papdopoulos. All rights reserved.
 #
 # This program and the accompanying materials are made available under the
@@ -8,8 +9,11 @@
 Controlled process
 """
 
+import control
+import logging
 
-def plant(poles,zeros,time_delay,user_defined_plant):
+
+def create_plant(poles,zeros,time_delay,user_defined_plant):
     """Creates the controlled process determined by the user input
        Plant creation supports poles (max:5), zeros (max:5), time delay
 
