@@ -18,8 +18,15 @@ else
     echo "Empty PROXY variable"
     PROXY=""
 fi
+# Python installation and other necessary libraries for pip
+#------------------------------------------------------------------------------
+apt-get update && apt-get install -y \
+    python-pip \
+    python3-pip \
+    python-virtualenv \
+    python3-matplotlib
 
-# Configure pip options
+# Configure pip optionspip
 #------------------------------------------------------------------------------
 pip_options=""
 
@@ -34,13 +41,12 @@ pip3 $pip_options install --upgrade pip
 mkdir $BASE_DIR/$VENV_DIR_PID_BO_CONTROLLER
 virtualenv --system-site-packages $BASE_DIR/$VENV_DIR_PID_BO_CONTROLLER
 
-wget https://raw.githubusercontent.com/intracom-telecom-sdn/nstat/master/deploy/requirements.txt -P $BASE_DIR
-source $BASE_DIR/$VENV_DIR_NSTAT/bin/activate
+wget https://raw.githubusercontent.com/konstantinos-papadopoulos/PID-BO-CONTROLLER/develop/deploy/requirements.txt -P $BASE_DIR
+source $BASE_DIR/$VENV_DIR_PID_BO_CONTROLLER/bin/activate
 pip3 $pip_options install -r $BASE_DIR/requirements.txt
 rm -rf $BASE_DIR/requirements.txt
 deactivate
-
-
+exit
 # This step is required to run jobs with any user
 #------------------------------------------------------------------------------
 chmod 777 -R $BASE_DIR

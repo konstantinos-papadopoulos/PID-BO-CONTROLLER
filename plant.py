@@ -11,9 +11,9 @@ Controlled process
 
 import control
 import logging
+import matplotlib.pyplot as plt
 
-
-def create_plant(poles,zeros,time_delay,user_defined_plant):
+def create_plant(args):
     """Creates the controlled process determined by the user input
        Plant creation supports poles (max:5), zeros (max:5), time delay
 
@@ -27,8 +27,14 @@ def create_plant(poles,zeros,time_delay,user_defined_plant):
     :type
     :type
     """
+    poles = args.poles
+    zeros = args.zeros
+    time_delay = args.time_delay
+    plant = control.TransferFunction(1, [1,1])
+    (T , yout) = control.step_response(plant)
+    plt.plot(T, yout)
+    plt.show()
 
-    pass
 
 def plant_estimation(poles,zeros,time_delay,user_defined_plant):
     """The method takes the real plant as an input and returns the settling

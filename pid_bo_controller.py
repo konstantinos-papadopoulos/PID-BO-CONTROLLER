@@ -36,7 +36,7 @@ def main():
                              "type_IV  (for elimination higher order errors )"
                              )
     parser.add_argument('--plant',
-                        required=True,
+                        required=False,
                         type=str,
                         dest='plant',
                         action='store',
@@ -58,7 +58,7 @@ def main():
                         help="number of zeros"
                              )
     parser.add_argument('--time-delay',
-                        required=True,
+                        required=False,
                         type=str,
                         dest='time_delay',
                         action='store',
@@ -95,10 +95,10 @@ def main():
 
     args = parser.parse_args()
 
-    var = input("Please enter something: ")
-    print(var)
-    print(args.poles)
-    plant.create_plant(poles, zeros, time_delay, user_defined_plant)
+    #var = input("Please enter something: ")
+    #print(var)
+    #print(args.poles)
+    plant.create_plant(args)
 
 
 if __name__ == '__main__':
