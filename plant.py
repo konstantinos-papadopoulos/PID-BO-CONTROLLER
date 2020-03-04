@@ -11,6 +11,7 @@ Controlled process
 
 import control
 import logging
+import matplotlib
 import matplotlib.pyplot as plt
 
 def create_plant(args):
@@ -32,7 +33,12 @@ def create_plant(args):
     time_delay = args.time_delay
     plant = control.TransferFunction(1, [1,1])
     (T , yout) = control.step_response(plant)
-    plt.plot(T, yout)
+    fig, ax = plt.subplots()
+    ax.plot(T, yout)
+    
+    ax.set(xlabel='time (s)', ylabel='yout (mV)',
+           title='Plant Open Loop step response')
+    plt.grid(color='k', linestyle='-.', linewidth=0.1)
     plt.show()
 
 
