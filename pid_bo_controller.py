@@ -94,10 +94,6 @@ def main():
                              "ERROR")
 
     args = parser.parse_args()
-
-    #var = input("Please enter something: ")
-    #print(var)
-    #print(args.poles)
     plant.create_plant(args)
 
 

@@ -7,7 +7,9 @@
 """
 Controlled process
 """
-
+def auto_tune_param_mainTspEstimation(plant):
+    
+    pass
 
 def pid_automatic_tuning_type_I(poles,zeros,time_delay,user_defined_plant):
     """Creates the controlled process determined by the user input
