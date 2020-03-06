@@ -9,6 +9,7 @@
 Controlled process
 """
 
+from collections import defaultdict
 import control
 import logging
 import matplotlib
@@ -35,38 +36,133 @@ def create_plant(args):
     time_delay = args.time_delay
     poles = []; polesSorted = [];
     zeros = []; zerosSorted = [];
-    for i in range(int(polesOrder)+1):
-        poles.append(random.random())
-    for j in range(int(zerosOrder)+1):
-        zeros.append(random.random())
+    for i in range(int(polesOrder)):
+        if polesOrder == 0:
+            poles = [0]
+        else:
+            poles.append(random.random())
+    for j in range(int(zerosOrder)):
+        if zerosOrder == 0:
+            zeros = [0]
+        else:
+            zeros.append(random.random())
     
     # Sort poles and zeros to identify dominant pole and dominant zeros
     # --------------------------------------------------------------------------
     polesSorted = sorted(poles, reverse=True)
     zerosSorted = sorted(zeros, reverse=True)
 
-    # plant zeros coefficients
-    # TODO: create a dynamic dictionary to tz_i based on the order of zeros 
-    # coming from the user
+    # plant pole/zeros coefficients using list comprehensions to create tzi,tpj
     # --------------------------------------------------------------------------
-    tz1 = zerosSorted[0]; tz2 = 0; tz3 = 0; 
-    tz4 = 0; 
-    
-    q0 = 1                                                         ;
-    q1 = tz1 + tz2 + tz3 + tz4                                     ;
-    q2 = tz1*tz2 + tz1*tz3 + tz1*tz4 + tz2*tz3 + tz2*tz4 + tz3*tz4 ;
-    q3 = tz1*tz2*tz3 + tz1*tz2*tz4 + tz2*tz3*tz4 + tz1*tz3*tz4     ;
-    q4 = tz1*tz2*tz3*tz4 
+    tzi = {}; tpj = {}; tzi_names = []; tpj_names = [];
+    if int(zerosOrder) > 0:
+        tzi_names = ['tz'+str(i+1) for i in range(int(zerosOrder))]
+        for i in range(len(tzi_names)):
+            tzi[tzi_names[i]] = zerosSorted[i]
+            
+    if int(polesOrder) > 0:    
+        tpj_names = ['tp'+str(j+1) for j in range(int(polesOrder))]  
+        for j in range(len(tpj_names)):
+            tpj[tpj_names[j]] = polesSorted[j]        
+    print(polesOrder)
+        
+    q0 = 1 ; q1 = sum(tzi.values());
+      
+    print('tzi-dictionary:',tzi)
+    print('-------------------------------------------------------------------')
+    q0 = 1
+    print('-------------------------------------------------------------------')
+    print('-------------------------------------------------------------------')
+    q1 = 0 
+    q1 = sum(tzi.values());
+    print('-------------------------------------------------------------------')
+    q2 = 0 
+    for i in range(int(zerosOrder)):
+        for j in range(int(zerosOrder)):
+            if  (i != j) and (i < j): 
+                print('i:',i+1,'j:',j+1); 
+                q2 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)] + q2
+                print('q2->',q2)
+    print('-------------------------------------------------------------------')
+    q3 = 0 
+    for i in range(int(zerosOrder)):
+        for j in range(int(zerosOrder)):
+            for k in range(int(zerosOrder)):
+               if  (i != j != k != i) and (i < j < k): 
+                   print('i:',i+1,'j:',j+1,'k:',k+1);
+                   q3 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)]*tzi['tz'+str(k+1)] + q3
+                   print('q3->',q3)
+    print('-------------------------------------------------------------------')
+    q4 = 0
+    for i in range(int(zerosOrder)):
+        for j in range(int(zerosOrder)):
+            for k in range(int(zerosOrder)):
+                for l in range(int(zerosOrder)):
+                    if  (i != j != k != l != i) and (i < j < k < l): 
+                        print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
+                        q4 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)]*tzi['tz'+str(k+1)]*tzi['tz'+str(l+1)] + q4
+                        print('q4->',q4)
+                        
+    print('tpj-dictionary:',tpj)
+    print('-------------------------------------------------------------------')
+    pGp0 = 1
+    print('-------------------------------------------------------------------')
+    pGp1 = 0 
+    pGp1 = sum(tpj.values());
+    print('-------------------------------------------------------------------')
+    pGp2 = 0 
+    for i in range(int(polesOrder)):
+        for j in range(int(polesOrder)):
+            if  (i != j) and (i < j): 
+                print('i:',i+1,'j:',j+1); 
+                pGp2 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] + pGp2
+                print('pGp2->',pGp2)
+    print('-------------------------------------------------------------------')
+    pGp3 = 0
+    for i in range(int(polesOrder)):
+        for j in range(int(polesOrder)):
+            for k in range(int(polesOrder)):
+               if  (i != j != k != i) and (i < j < k): 
+                   print('i:',i+1,'j:',j+1,'k:',k+1);
+                   pGp3 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)] + pGp3
+                   print('pGp3->',pGp3)
 
+    print('-------------------------------------------------------------------')
+    pGp4 = 0
+    for i in range(int(polesOrder)):
+        for j in range(int(polesOrder)):
+            for k in range(int(polesOrder)):
+                for l in range(int(polesOrder)):
+                    if  (i != j != k != l != i) and (i < j < k < l): 
+                        print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
+                        pGp4 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] + pGp4
+                        print('pGp4->',pGp4)
+    print('-------------------------------------------------------------------')
+    pGp5 = 0
+    for i in range(int(polesOrder)):
+        for j in range(int(polesOrder)):
+            for k in range(int(polesOrder)):
+                for l in range(int(polesOrder)):
+                    for m in range(int(polesOrder)):
+                        if  (i != j != k != l != m != i) and (i < j < k < l < m): 
+                            print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1,'m:',m+1);
+                            pGp5 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)]*tpj['tp'+str(m+1)] + pGp5
+                            print('pGp5->',pGp5)
+    print('-------------------------------------------------------------------')                            
+    print('pGp0->',pGp0)
+    print('pGp1->',pGp1)
+    print('pGp2->',pGp2)
+    print('pGp3->',pGp3)
+    print('pGp4->',pGp4)
+    print('pGp5->',pGp5)
+    
+    exit()
     # plant poles coefficients dynamics
     # TODO: create a dynamic dictionary to tp_i based on the order of zeros 
     # coming from the user    
     # --------------------------------------------------------------------------
-    tp1 = polesSorted[0]; tp2 = polesSorted[1]; tp3 = polesSorted[2]; 
-    tp4 = polesSorted[3]; tp5 = polesSorted[4];
-
-    pGp0 = 1; 
-    pGp1 = sum(polesSorted); # tp1 + tp2 + tp3 + tp4 + tp5
+    pGp0 = 1; pGp1 = sum(tpj.values());
+    
     pGp2 = tp1*tp2 + tp1*tp3 + tp1*tp4 + tp1*tp5 + tp2*tp3 + \
            tp2*tp4 + tp2*tp5 + tp3*tp4 + tp3*tp5 + tp4*tp5;
 
