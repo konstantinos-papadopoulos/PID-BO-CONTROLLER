@@ -174,36 +174,39 @@ def create_plant(args):
         n1 = timeDelay
         n2 = pow(timeDelay,2) / 2.0
         n3 = pow(timeDelay,3) / 6.0
-    e_exp = [1.0, 1.0, (1.0/2.0) * pow(timeDelay,2), (1.0/6.0) * pow(timeDelay,3), \
-             (1.0/24.0) * pow(timeDelay,4), (1.0/120.0) * pow(timeDelay,5)]                     
+    e_exp = [1.0, 1.0, (1.0/2.0) * pow(timeDelay,2), \
+             (1.0/6.0) * pow(timeDelay,3), (1.0/24.0) * pow(timeDelay,4), \
+             (1.0/120.0) * pow(timeDelay,5)]                     
     p, q = pade(e_exp, 5)
     print(p)
     print(q)
-    exit()
+    
     # plant poles coefficients dynamics
     # TODO: create a dynamic dictionary to tp_i based on the order of zeros 
     # coming from the user    
     # --------------------------------------------------------------------------
-    pGp0 = 1; pGp1 = sum(tpj.values());
-    
-    pGp2 = tp1*tp2 + tp1*tp3 + tp1*tp4 + tp1*tp5 + tp2*tp3 + \
-           tp2*tp4 + tp2*tp5 + tp3*tp4 + tp3*tp5 + tp4*tp5;
-
-    pGp3 = tp1*tp2*tp3 + tp1*tp2*tp4 + tp1*tp2*tp5 + tp1*tp3*tp4 + \
-           tp1*tp3*tp5 + tp1*tp4*tp5 + tp2*tp3*tp4 + tp2*tp3*tp5 + tp2*tp4*tp5 \
-           + tp3*tp4*tp5;
-
-    pGp4 = tp1*tp2*tp3*tp4 + tp1*tp2*tp3*tp5 + tp1*tp2*tp4*tp5 + \
-           tp1*tp3*tp4*tp5 + tp2*tp3*tp4*tp5;
-    pGp5 = tp1*tp2*tp3*tp4*tp5
-
+ #==============================================================================
+ #    pGp0 = 1; pGp1 = sum(tpj.values());
+ #     
+ #    pGp2 = tp1*tp2 + tp1*tp3 + tp1*tp4 + tp1*tp5 + tp2*tp3 + \
+ #           tp2*tp4 + tp2*tp5 + tp3*tp4 + tp3*tp5 + tp4*tp5;
+ # 
+ #    pGp3 = tp1*tp2*tp3 + tp1*tp2*tp4 + tp1*tp2*tp5 + tp1*tp3*tp4 + \
+ #           tp1*tp3*tp5 + tp1*tp4*tp5 + tp2*tp3*tp4 + tp2*tp3*tp5 + tp2*tp4*tp5 \
+ #           + tp3*tp4*tp5;
+ # 
+ #    pGp4 = tp1*tp2*tp3*tp4 + tp1*tp2*tp3*tp5 + tp1*tp2*tp4*tp5 + \
+ #           tp1*tp3*tp4*tp5 + tp2*tp3*tp4*tp5;
+ #    pGp5 = tp1*tp2*tp3*tp4*tp5
+ # 
     numGp = [q4, q3, q2, q1, q0];
+    kpnumGp = [i * kp for i in numGp]
     denGp  = [pGp5, pGp4, pGp3, pGp2, pGp1, pGp0];
-    plantGp = control.tf(numGp,denGp);
-
+    plantGp = control.tf(kpnumGp,denGp);
+ #==============================================================================
     
     (T , yout) = control.step_response(plantGp)
-    plotStepResponse(T, yout)
+    plotStepResponse(T, yout, kp)
     
     return plantGp
 
@@ -220,12 +223,19 @@ def plantAlpha(args):
     
     pass
 
-def plotStepResponse(T, yout):
-    
+def plotStepResponse(T, yout, kp):
+    """ The methdo takes the vector of a step response in T, yout form plus the
+    dc gain kp at steady state and plot on Figure with the step response plus a
+    straight horizontal line based in kp  
+    """
+    kpLine = [1] * len(T)
     fig, ax = plt.subplots()
     ax.plot(T, yout)
+    kpLine = [i * kp for i in kpLine]
+    ax.plot(T, kpLine)
     ax.set(xlabel='time (s)', ylabel='$y_{out}$',
            title='Plant $G_p$ Open Loop step response')
+    ax.legend([ 'step response','dc-gain: kp:' + str(format(kp, '.2f'))])
     plt.grid(color='k', linestyle='-.', linewidth=0.1)
     plt.show()
 
