@@ -98,7 +98,8 @@ def create_plant(args):
             for k in range(int(zerosOrder)):
                if  (i != j != k != i) and (i < j < k): 
                    print('i:',i+1,'j:',j+1,'k:',k+1);
-                   q3 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)]*tzi['tz'+str(k+1)] + q3
+                   q3 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
+                        tzi['tz'+str(k+1)] + q3
                    print('q3->',q3)
     print('-------------------------------------------------------------------')
     q4 = 0
@@ -108,7 +109,8 @@ def create_plant(args):
                 for l in range(int(zerosOrder)):
                     if  (i != j != k != l != i) and (i < j < k < l): 
                         print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
-                        q4 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)]*tzi['tz'+str(k+1)]*tzi['tz'+str(l+1)] + q4
+                        q4 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
+                        tzi['tz'+str(k+1)] * tzi['tz'+str(l+1)] + q4
                         print('q4->',q4)
                         
     print('tpj-dictionary:',tpj)
@@ -132,7 +134,8 @@ def create_plant(args):
             for k in range(int(polesOrder)):
                if  (i != j != k != i) and (i < j < k): 
                    print('i:',i+1,'j:',j+1,'k:',k+1);
-                   pGp3 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)] + pGp3
+                   pGp3 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                   tpj['tp'+str(k+1)] + pGp3
                    print('pGp3->',pGp3)
 
     print('-------------------------------------------------------------------')
@@ -143,7 +146,8 @@ def create_plant(args):
                 for l in range(int(polesOrder)):
                     if  (i != j != k != l != i) and (i < j < k < l): 
                         print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
-                        pGp4 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] + pGp4
+                        pGp4 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                        tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] + pGp4
                         print('pGp4->',pGp4)
     print('-------------------------------------------------------------------')
     pGp5 = 0
@@ -154,7 +158,9 @@ def create_plant(args):
                     for m in range(int(polesOrder)):
                         if  (i != j != k != l != m != i) and (i < j < k < l < m): 
                             print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1,'m:',m+1);
-                            pGp5 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)]*tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)]*tpj['tp'+str(m+1)] + pGp5
+                            pGp5 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                            tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] * \
+                            tpj['tp'+str(m+1)] + pGp5
                             print('pGp5->',pGp5)
     print('-------------------------------------------------------------------')                            
     print('pGp0->',pGp0)
@@ -269,7 +275,7 @@ def plant_normalize():
        state gain, an estimation of the plant's unmodelled dynamics and the
        plant transfer function [first order mode] based on the step response
        measurements). All above measurements will be used as an input for
-       initializing the automatic tuning algorith,
+       initializing the automatic tuning algorithm,
 
        Plant creation supports poles (max:5), zeros (max:5), time delay
        Plant creation supports poles (max:5), zeros (max:5), time delay
