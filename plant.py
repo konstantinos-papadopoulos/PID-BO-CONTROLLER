@@ -10,6 +10,7 @@ Controlled process
 """
 
 from collections import defaultdict
+from scipy.interpolate import pade
 import control
 import logging
 import matplotlib
@@ -36,16 +37,23 @@ def create_plant(args):
     time_delay = args.time_delay
     poles = []; polesSorted = [];
     zeros = []; zerosSorted = [];
+    # poles generation
+    # --------------------------------------------------------------------------
     for i in range(int(polesOrder)):
         if polesOrder == 0:
             poles = [0]
         else:
             poles.append(random.random())
+    # zeros generation
+    # --------------------------------------------------------------------------
     for j in range(int(zerosOrder)):
         if zerosOrder == 0:
             zeros = [0]
         else:
             zeros.append(random.random())
+    # delay generation
+    # --------------------------------------------------------------------------
+    timeDelay =  random.random()
     
     # Sort poles and zeros to identify dominant pole and dominant zeros
     # --------------------------------------------------------------------------
@@ -156,6 +164,21 @@ def create_plant(args):
     print('pGp4->',pGp4)
     print('pGp5->',pGp5)
     
+    # Pade approximation
+    # --------------------------------------------------------------------------
+    n1 = 0
+    n2 = 0
+    n3 = pow(timeDelay,3) / 6
+    
+    if timeDelay != 0:
+        n1 = timeDelay
+        n2 = pow(timeDelay,2) / 2.0
+        n3 = pow(timeDelay,3) / 6.0
+    e_exp = [1.0, 1.0, (1.0/2.0) * pow(timeDelay,2), (1.0/6.0) * pow(timeDelay,3), \
+             (1.0/24.0) * pow(timeDelay,4), (1.0/120.0) * pow(timeDelay,5)]                     
+    p, q = pade(e_exp, 5)
+    print(p)
+    print(q)
     exit()
     # plant poles coefficients dynamics
     # TODO: create a dynamic dictionary to tp_i based on the order of zeros 
