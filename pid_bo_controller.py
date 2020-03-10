@@ -96,7 +96,7 @@ def main():
     args = parser.parse_args()
     plantGp = plant.Plant(args)
     plantGp.create_plant(args)
-
+    FclOptimal = pid_optimal_tuning.ControllerOptimal(args)
 
 if __name__ == '__main__':
     main()

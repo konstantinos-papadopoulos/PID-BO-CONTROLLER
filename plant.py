@@ -36,7 +36,7 @@ class Plant:
         :type json_conf:
         :type test_type: str
         """
-
+      tzi, tpj, plantGp = self.create_plant(args)
 
     def create_plant(self, args):
         """Creates the controlled process determined by the user input
@@ -81,7 +81,7 @@ class Plant:
         (T , yout) = control.step_response(plantGp)
         self.plotStepResponse(T, yout, kp)
 
-        return plantGp
+        return tzi, tpj, plantGp
 
     def tziDictCreate(self, zeros, zerosOrder):
         """
