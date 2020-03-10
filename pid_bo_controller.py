@@ -94,7 +94,8 @@ def main():
                              "ERROR")
 
     args = parser.parse_args()
-    plant.create_plant(args)
+    plantGp = plant.Plant(args)
+    plantGp.create_plant(args)
 
 
 if __name__ == '__main__':

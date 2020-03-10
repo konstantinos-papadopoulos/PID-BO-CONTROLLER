@@ -4,28 +4,45 @@
 # terms of the Eclipse Public License v1.0 which accompanies this distribution,
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 
-"""
-Controlled process
-"""
-def auto_tune_param_mainTspEstimation(plant):
-    
-    pass
 
-def pid_automatic_tuning_type_I(poles,zeros,time_delay,user_defined_plant):
-    """Creates the controlled process determined by the user input
-       Plant creation supports poles (max:5), zeros (max:5), time delay
-
-    :param poles
-    :param zeros
-    :param time_delay
-    :param user_defined_plant
-    :
-    :type
-    :type
-    :type
-    :type
+class ControllerAutomatic:
     """
+    Creates a Test run object
+    """
+    def __init__(self, args):
+            """
+        Initializes the appropriate test component objects according to the
+        test_type and the test configuration json object, in order to prepare
+        the test for running
 
-    pass
+        :param args:
+        :param json_conf:
+        :param test_type:
+        :type args:
+        :type json_conf:
+        :type test_type: str
+        """
+        # CONTROLLER preparation
+
+    def autoTuneParamMainTspEstimation(self, args):
+
+        pass
+
+    def pidAutomaticTuningTypeI(self, args):
+        """Creates the controlled process determined by the user input
+           Plant creation supports poles (max:5), zeros (max:5), time delay
+
+        :param poles
+        :param zeros
+        :param time_delay
+        :param user_defined_plant
+        :
+        :type
+        :type
+        :type
+        :type
+        """
+
+        pass
 
 
