@@ -24,7 +24,7 @@ class Plant:
     Creates a Test run object
     """
     def __init__(self, args):
-            """
+        """
         Initializes the appropriate test component objects according to the
         test_type and the test configuration json object, in order to prepare
         the test for running
@@ -53,11 +53,67 @@ class Plant:
         :type
         """
         kp = random.random();
-        polesOrder = args.poles
         zerosOrder = args.zeros
+        polesOrder = args.poles
         time_delay = args.time_delay
-        poles = []; polesSorted = [];
-        zeros = []; zerosSorted = [];
+        zeros = self.zerosRandomGeneration(zerosOrder)
+        poles = self.polesRandomGeneration(polesOrder)
+        tzi = self.tziDictCreate(zeros, zerosOrder)
+        tpj = self.tpjDictCreate(poles, polesOrder)
+        # time delay generation
+        # --------------------------------------------------------------------------
+        timeDelay =  100.0*random.random()
+
+        # Sort poles and zeros to identify dominant pole and dominant zeros
+        # ----------------------------------------------------------------------
+        numGp = self.createZerosCoefficients(zerosOrder, tzi)
+        denGp  = self.createPolesCoefficients(polesOrder, tpj);
+
+        kpnumGp = [i * kp for i in numGp]
+        plantGp = control.tf(kpnumGp,denGp);
+
+        Gd = self.createTimeDelayPlant(timeDelay)
+        Gp = control.series(plantGp, Gd)
+        print(plantGp)
+        print(Gd)
+        print(Gp)
+
+        (T , yout) = control.step_response(plantGp)
+        self.plotStepResponse(T, yout, kp)
+
+        return plantGp
+
+    def tziDictCreate(self, zeros, zerosOrder):
+        """
+        """
+
+        zerosSorted = [];
+        zerosSorted = sorted(zeros, reverse=True)
+        tzi = {};  tzi_names = [];
+        if int(zerosOrder) > 0:
+            tzi_names = ['tz'+str(i+1) for i in range(int(zerosOrder))]
+            for i in range(len(tzi_names)):
+                tzi[tzi_names[i]] = zerosSorted[i]
+
+        return tzi
+
+    def tpjDictCreate(self, poles, polesOrder):
+        """
+        """
+        polesSorted = [];
+        polesSorted = sorted(poles, reverse=True)
+        tpj = {}; tpj_names = [];
+        if int(polesOrder) > 0:
+            tpj_names = ['tp'+str(j+1) for j in range(int(polesOrder))]
+            for j in range(len(tpj_names)):
+                tpj[tpj_names[j]] = polesSorted[j]
+
+        return tpj
+
+    def polesRandomGeneration(self, polesOrder):
+        """
+        """
+        poles = [];
         # poles generation
         # --------------------------------------------------------------------------
         for i in range(int(polesOrder)):
@@ -65,139 +121,27 @@ class Plant:
                 poles = [0]
             else:
                 poles.append(random.random())
+
+        return poles
+
+    def zerosRandomGeneration(self, zerosOrder):
+        """
+        """
         # zeros generation
         # --------------------------------------------------------------------------
+        zeros = [];
         for j in range(int(zerosOrder)):
             if zerosOrder == 0:
                 zeros = [0]
             else:
                 zeros.append(random.random())
-        # delay generation
-        # --------------------------------------------------------------------------
-        timeDelay =  100.0*random.random()
 
-        # Sort poles and zeros to identify dominant pole and dominant zeros
-        # --------------------------------------------------------------------------
-        polesSorted = sorted(poles, reverse=True)
-        zerosSorted = sorted(zeros, reverse=True)
+        return zeros
 
-        # plant pole/zeros coefficients using list comprehensions to create tzi,
-        # tpj
-        # --------------------------------------------------------------------------
-        tzi = {}; tpj = {}; tzi_names = []; tpj_names = [];
-        if int(zerosOrder) > 0:
-            tzi_names = ['tz'+str(i+1) for i in range(int(zerosOrder))]
-            for i in range(len(tzi_names)):
-                tzi[tzi_names[i]] = zerosSorted[i]
+    def createTimeDelayPlant(self, timeDelay):
+        """
+        """
 
-        if int(polesOrder) > 0:
-            tpj_names = ['tp'+str(j+1) for j in range(int(polesOrder))]
-            for j in range(len(tpj_names)):
-                tpj[tpj_names[j]] = polesSorted[j]
-        print(polesOrder)
-
-        q0 = 1 ;
-        print('tzi-dictionary:',tzi)
-        print('-------------------------------------------------------------------')
-        q0 = 1
-        print('-------------------------------------------------------------------')
-        print('-------------------------------------------------------------------')
-        q1 = 0
-        q1 = sum(tzi.values());
-        print('-------------------------------------------------------------------')
-        q2 = 0
-        for i in range(int(zerosOrder)):
-            for j in range(int(zerosOrder)):
-                if  (i != j) and (i < j):
-                    print('i:',i+1,'j:',j+1);
-                    q2 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)] + q2
-                    print('q2->',q2)
-        print('-------------------------------------------------------------------')
-        q3 = 0
-        for i in range(int(zerosOrder)):
-            for j in range(int(zerosOrder)):
-                for k in range(int(zerosOrder)):
-                   if  (i != j != k != i) and (i < j < k):
-                       print('i:',i+1,'j:',j+1,'k:',k+1);
-                       q3 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
-                            tzi['tz'+str(k+1)] + q3
-                       print('q3->',q3)
-        print('-------------------------------------------------------------------')
-        q4 = 0
-        for i in range(int(zerosOrder)):
-            for j in range(int(zerosOrder)):
-                for k in range(int(zerosOrder)):
-                    for l in range(int(zerosOrder)):
-                        if  (i != j != k != l != i) and (i < j < k < l):
-                            print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
-                            q4 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
-                            tzi['tz'+str(k+1)] * tzi['tz'+str(l+1)] + q4
-                            print('q4->',q4)
-
-        print('tpj-dictionary:',tpj)
-        print('-------------------------------------------------------------------')
-        pGp0 = 1
-        print('-------------------------------------------------------------------')
-        pGp1 = 0
-        pGp1 = sum(tpj.values());
-        print('-------------------------------------------------------------------')
-        pGp2 = 0
-        for i in range(int(polesOrder)):
-            for j in range(int(polesOrder)):
-                if  (i != j) and (i < j):
-                    print('i:',i+1,'j:',j+1);
-                    pGp2 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] + pGp2
-                    print('pGp2->',pGp2)
-        print('-------------------------------------------------------------------')
-        pGp3 = 0
-        for i in range(int(polesOrder)):
-            for j in range(int(polesOrder)):
-                for k in range(int(polesOrder)):
-                   if  (i != j != k != i) and (i < j < k):
-                       print('i:',i+1,'j:',j+1,'k:',k+1);
-                       pGp3 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
-                       tpj['tp'+str(k+1)] + pGp3
-                       print('pGp3->',pGp3)
-
-        print('-------------------------------------------------------------------')
-        pGp4 = 0
-        for i in range(int(polesOrder)):
-            for j in range(int(polesOrder)):
-                for k in range(int(polesOrder)):
-                    for l in range(int(polesOrder)):
-                        if  (i != j != k != l != i) and (i < j < k < l):
-                            print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
-                            pGp4 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
-                            tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] + pGp4
-                            print('pGp4->',pGp4)
-        print('-------------------------------------------------------------------')
-        pGp5 = 0
-        for i in range(int(polesOrder)):
-            for j in range(int(polesOrder)):
-                for k in range(int(polesOrder)):
-                    for l in range(int(polesOrder)):
-                        for m in range(int(polesOrder)):
-                            if  (i != j != k != l != m != i) and (i < j < k < l < m):
-                                print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1,'m:',m+1);
-                                pGp5 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
-                                tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] * \
-                                tpj['tp'+str(m+1)] + pGp5
-                                print('pGp5->',pGp5)
-        print('-------------------------------------------------------------------')
-        print('pGp0->',pGp0)
-        print('pGp1->',pGp1)
-        print('pGp2->',pGp2)
-        print('pGp3->',pGp3)
-        print('pGp4->',pGp4)
-        print('pGp5->',pGp5)
-    #
-        numGp = [q4, q3, q2, q1, q0];
-        kpnumGp = [i * kp for i in numGp]
-        denGp  = [pGp5, pGp4, pGp3, pGp2, pGp1, pGp0];
-        plantGp = control.tf(kpnumGp,denGp);
-
-        # Pade approximation
-        # --------------------------------------------------------------------------
         n1 = 0
         n2 = 0
         n3 = pow(timeDelay,3) / 6
@@ -215,24 +159,132 @@ class Plant:
             padeApproximationOrder = 20
             numGd, denGd = control.pade(timeDelay, padeApproximationOrder)
             Gd = control.tf(numGd, denGd)
-            Gp = control.series(plantGp, Gd)
 
-        print(plantGp)
-        print(Gd)
-        print(Gp)
+        return Gd
 
-        (T , yout) = control.step_response(plantGp)
-        self.plotStepResponse(T, yout, kp)
 
-        return plantGp
+    def createZerosCoefficients(self, zerosOrder, tzi):
+        """
+        """
+
+        q0 = 1 ;
+        print('tzi-dictionary:',tzi)
+        print('---------------------------------------------------------------')
+        q0 = 1
+        print('---------------------------------------------------------------')
+        print('---------------------------------------------------------------')
+        q1 = 0
+        q1 = sum(tzi.values());
+        print('---------------------------------------------------------------')
+        q2 = 0
+        for i in range(int(zerosOrder)):
+            for j in range(int(zerosOrder)):
+                if  (i != j) and (i < j):
+                    print('i:',i+1,'j:',j+1);
+                    q2 = tzi['tz'+str(i+1)]*tzi['tz'+str(j+1)] + q2
+                    print('q2->',q2)
+        print('---------------------------------------------------------------')
+        q3 = 0
+        for i in range(int(zerosOrder)):
+            for j in range(int(zerosOrder)):
+                for k in range(int(zerosOrder)):
+                   if  (i != j != k != i) and (i < j < k):
+                       print('i:',i+1,'j:',j+1,'k:',k+1);
+                       q3 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
+                            tzi['tz'+str(k+1)] + q3
+                       print('q3->',q3)
+        print('---------------------------------------------------------------')
+        q4 = 0
+        for i in range(int(zerosOrder)):
+            for j in range(int(zerosOrder)):
+                for k in range(int(zerosOrder)):
+                    for l in range(int(zerosOrder)):
+                        if  (i != j != k != l != i) and (i < j < k < l):
+                            print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
+                            q4 = tzi['tz'+str(i+1)] * tzi['tz'+str(j+1)] * \
+                            tzi['tz'+str(k+1)] * tzi['tz'+str(l+1)] + q4
+                            print('q4->',q4)
+
+        print('tzi-dictionary:', tzi)
+        print('---------------------------------------------------------------')
+        numGp = [q4, q3, q2, q1, q0];
+        return numGp
+
+    def createPolesCoefficients(self, polesOrder, tpj):
+        """
+        """
+
+        pGp0 = 1
+        print('---------------------------------------------------------------')
+        pGp1 = 0
+        pGp1 = sum(tpj.values());
+        print('---------------------------------------------------------------')
+        pGp2 = 0
+        for i in range(int(polesOrder)):
+            for j in range(int(polesOrder)):
+                if  (i != j) and (i < j):
+                    print('i:',i+1,'j:',j+1);
+                    pGp2 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] + pGp2
+                    print('pGp2->',pGp2)
+        print('---------------------------------------------------------------')
+        pGp3 = 0
+        for i in range(int(polesOrder)):
+            for j in range(int(polesOrder)):
+                for k in range(int(polesOrder)):
+                   if  (i != j != k != i) and (i < j < k):
+                       print('i:',i+1,'j:',j+1,'k:',k+1);
+                       pGp3 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                       tpj['tp'+str(k+1)] + pGp3
+                       print('pGp3->',pGp3)
+
+        print('---------------------------------------------------------------')
+        pGp4 = 0
+        for i in range(int(polesOrder)):
+            for j in range(int(polesOrder)):
+                for k in range(int(polesOrder)):
+                    for l in range(int(polesOrder)):
+                        if  (i != j != k != l != i) and (i < j < k < l):
+                            print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1);
+                            pGp4 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                            tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] + pGp4
+                            print('pGp4->',pGp4)
+        print('---------------------------------------------------------------')
+        pGp5 = 0
+        for i in range(int(polesOrder)):
+            for j in range(int(polesOrder)):
+                for k in range(int(polesOrder)):
+                    for l in range(int(polesOrder)):
+                        for m in range(int(polesOrder)):
+                            if  (i != j != k != l != m != i) and (i < j < k < l < m):
+                                print('i:',i+1,'j:',j+1,'k:',k+1,'l:',l+1,'m:',m+1);
+                                pGp5 = tpj['tp'+str(i+1)]*tpj['tp'+str(j+1)] * \
+                                tpj['tp'+str(k+1)]*tpj['tp'+str(l+1)] * \
+                                tpj['tp'+str(m+1)] + pGp5
+                                print('pGp5->',pGp5)
+        print('---------------------------------------------------------------')
+        print('pGp0->',pGp0)
+        print('pGp1->',pGp1)
+        print('pGp2->',pGp2)
+        print('pGp3->',pGp3)
+        print('pGp4->',pGp4)
+        print('pGp5->',pGp5)
+
+        denGp  = [pGp5, pGp4, pGp3, pGp2, pGp1, pGp0];
+
+        return denGp
+
+
 
     def plantRandom(self, args):
+        """
+        """
         alpha = 0.1
 
         pass
 
     def plantDetermined(self, args):
-
+        """
+        """
         pass
 
     def plantAlpha(self, args):
